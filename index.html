@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>dynamic flexbox cheat sheet</title>
+</head>
+<body>
+<style>
+/* css reset */
+:root {
+	box-sizing: border-box;
+}
+*, ::before, ::after {
+	box-sizing: inherit;
+	margin: 0;
+	padding: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* end css reset */
+
+html {
+	font-family: Arial, Helvetica, sans-serif;
+}
+body {
+	padding-bottom: 2em;
+	text-align: center;
+	background-color: lightgray;
+}
+header {
+	padding: 1em;
+	background-color: gray;
+}
+h1 {
+	font-size: 2rem;
+	color: whitesmoke;
+}
+button {
+	padding: 0.5em;
+    font-size: 1em;
+	border-radius: 0.3em;
+	background-color: whitesmoke;
+	cursor: pointer;
+
+}
+button:hover {
+	background-color:lightgray;
+}
+.toolbar {
+	margin-top: 0.2em;
+	margin-bottom: 0.4em;
+}
+.properties {
+	display: flex;
+	flex-direction: row;
+	justify-content: start;
+	flex-wrap: wrap;
+	gap: 1em;
+	margin: 0 1em;
+	--flex-direction: row;
+	--flex-wrap: wrap;
+	--align-items: flex-start;
+	--justify-content: flex-start;
+	--align-content: flex-start;
+	--row-gap: 0;
+	--column-gap: 0;
+}
+.property {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-start;
+	gap: 0.5em;
+	padding-left: 1em;
+	border-left-style: solid;
+	border-left-width: 2px;
+	border-left-color: darkgray;
+}
+.property-name {
+	margin:0;
+}
+.property-name h2 {
+	font-size: 1.2rem;
+}
+.values {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: start;
+	gap:2em;
+}
+.value-description {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 0.5em;
+}
+.property-value {
+	margin:0;
+	padding: 0.2em;
+	font-weight: 600;
+}
+.property-value[data-selected="1"] {
+	background-color: rgba(255, 166, 0, 0.347);
+}
+.picto {
+	display: flex;
+	width: 64px;
+	height: 64px;
+	border-width: 1px;
+	border-radius: 4px;
+	border-style: solid;
+	border-color: black;
+	gap: 0;
+	overflow: hidden;
+	flex-direction: var(--flex-direction);
+	flex-wrap: var(--flex-wrap);
+	align-items: var(--align-items);
+	justify-content: var(--justify-content);
+	align-content: var(--align-content);
+	row-gap: var(--row-gap);
+	column-gap: var(--column-gap);
+}
+.bloc {
+	padding: 0 0.5px;
+	line-height: 9px;
+	overflow: hidden;
+	border-width: 0.5px;
+	border-color: orange;
+	border-style: solid;
+	background-color: black;
+	color: white;
+}
+</style>
+
+	<header><h1>Dynamic flexbox cheat sheet</h1></header>
+	<svg version="2.0" style="display: none;" id="digits-in-svg">
+		<defs>
+			<!-- found in https://www.iconhunt.site/?search=digit -->
+			<symbol id="digit-0"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-zero -->
+				<path fill="currentColor" d="M62.79 25C42.87 25 30 40.47 30 64.42c0 23.95 12.87 39.43 32.79 39.43s32.79-15.47 32.79-39.43C95.59 40.47 82.71 25 62.79 25zm0 60.21c-9.53 0-12.91-11.2-12.91-20.79c0-9.58 3.38-20.78 12.91-20.78s12.92 11.2 12.92 20.78c0 9.59-3.39 20.79-12.92 20.79z"></path>
+			</symbol>
+			<symbol id="digit-1"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-one -->
+				<path fill="currentColor" d="m47.33 46.63l7.51-2.15V85.7h-5.79c-.62 0-1.11.5-1.11 1.11v14.09c0 .62.49 1.11 1.11 1.11h29.93c.61 0 1.1-.49 1.1-1.11V86.8c0-.61-.49-1.11-1.1-1.11h-5.79V25.35c0-.34-.16-.66-.42-.86c-.26-.21-.6-.3-.93-.22l-25.05 5.38c-.5.11-.87.56-.87 1.08v14.84c0 .35.16.68.44.89c.28.2.64.27.97.17z"></path>
+			</symbol>
+			<symbol id="digit-2"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-two -->
+				<path fill="currentColor" d="M88.96 82.84H61.82c4.27-2.62 11.75-7.79 20.24-16.28c7.95-7.95 10.62-22.42 1.1-31.95c-5.51-5.5-11.77-8.29-18.63-8.29c-15.14 0-27.77 13.39-28.31 13.96c-.34.37-.39.91-.13 1.34l6.83 11.14c.18.29.47.47.8.52c.33.05.66-.05.91-.29c.08-.07 8.32-7.71 15.54-7.71c2.91 0 5.18 1.22 6.95 3.74c1.45 2.05 1.87 4.32 1.3 6.9c-2.76 12.33-27.09 26.29-27.34 26.42c-.34.2-.56.57-.56.97V97.9c0 .62.5 1.12 1.12 1.12h47.32c.61 0 1.1-.5 1.1-1.12V83.95c0-.62-.49-1.11-1.1-1.11z"></path>
+			</symbol>
+			<symbol id="digit-3"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-three -->
+				<path fill="currentColor" d="M63.41 101.77h.4c4.59-.07 13.28-1.07 19.9-7.03c5.52-4.97 8.08-11.75 7.02-18.62c-.98-6.4-5.01-11.86-11.16-15.2c5.9-4.44 9.44-9.98 10.06-15.74c.6-5.59-1.58-11.16-6.32-16.12c-4.76-4.98-11.18-7.61-18.55-7.61c-11.35 0-21.8 6.01-24.98 10.34a1.1 1.1 0 0 0-.02 1.25l7.05 10.2c.17.25.43.41.74.46c.29.04.6-.04.84-.23c.08-.07 7.75-6.34 14.28-6.34c2.99 0 5.2 1.31 6.75 4c1.29 2.25 1.54 4.31.75 6.26c-2.15 5.33-11.26 8.01-11.35 8.04c-.46.13-.78.55-.78 1.04v8.98c0 .49.33.93.82 1.04c.09.02 8.75 2.17 10.73 7.14c.77 1.95.38 4.15-1.17 6.56c-1.64 2.54-4.13 3.83-7.39 3.83c-6.32 0-14.06-4.8-17.47-7.82c-.24-.2-.53-.31-.85-.27c-.31.04-.58.2-.76.46l-7.05 10.2c-.27.4-.25.94.07 1.31c.51.55 12.06 13.87 28.44 13.87z"></path>
+			</symbol>
+			<symbol id="digit-4"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-four -->
+				<path fill="currentColor" d="M92.92 73.42H80.09V26.4c0-.18-.05-.33-.12-.47c0-.01 0-.03-.01-.04c-.01-.02-.04-.04-.05-.06c-.08-.11-.17-.21-.28-.29c-.04-.03-.07-.06-.11-.08c-.15-.08-.32-.13-.5-.13H62.64c-.17 0-.32.05-.47.12c-.04.02-.08.05-.12.08c-.1.07-.18.14-.26.24c-.02.02-.05.03-.06.06l-31.18 48.1c-.01.02-.01.05-.02.07c-.07.13-.12.27-.14.42c0 .02-.01.05-.01.08v13.18c0 .6.48 1.08 1.07 1.08h30.09v13.17c0 .6.49 1.08 1.09 1.08H79c.6 0 1.08-.48 1.08-1.08V88.75h12.83c.59 0 1.08-.48 1.08-1.08V74.5c.01-.59-.48-1.08-1.07-1.08zM61.55 55.31v18.11H49.82l11.73-18.11z"></path>
+			</symbol>
+			<symbol id="digit-5"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-five -->
+				<path fill="currentColor" d="M59.07 85.24c-6.7 0-13.93-2.32-17.61-4.62c-.27-.17-.61-.2-.92-.1c-.3.11-.54.36-.63.66l-4.14 12.89c-.15.46.03.95.43 1.21c.51.32 12.54 7.87 25.64 7.87c2.73 0 5.34-.34 7.75-1c4.31-1.19 12.26-4.27 17.05-11.52c3.3-4.99 4.41-11.05 3.14-17.05c-1.4-6.61-5.54-12.4-11.67-16.33c-4.74-2.8-10.91-4.39-18.38-4.76l1.04-12.08h26.15c.59 0 1.08-.49 1.08-1.08V25.9c0-.6-.49-1.08-1.08-1.08h-42.7c-.15 0-.29.03-.41.09c-.04.02-.07.05-.12.07c-.08.04-.16.09-.22.15c-.04.04-.07.08-.1.13c-.05.06-.11.12-.13.19c-.02.06-.04.12-.05.18c-.02.06-.05.11-.06.18l-3.85 43.11c-.02.35.11.69.37.92a1.11 1.11 0 0 0 .96.23l.26-.07c1.27-.17 6.14-.8 11.6-.8c8.45 0 14.22 1.46 16.72 4.23c1.13 1.25 1.59 2.77 1.39 4.63c-.61 5.94-6.59 7.18-11.51 7.18z"></path>
+			</symbol>
+			<symbol id="digit-6"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-six -->
+				<path fill="currentColor" d="M33.58 81.24c.04.34.1.67.15 1.01c.05.33.09.65.15.99l.06.29c.07.36.15.73.23 1.08c.1.43.22.85.34 1.27C37.87 97.29 49.06 105 63.61 105h.03c17.46-.01 30.14-11.12 30.14-26.43S81.09 52.14 63.62 52.14c-2.22 0-4.37.18-6.42.53c6.71-11.7 17.03-18.38 17.13-18.45c.28-.17.45-.45.48-.75c.03-.31-.08-.62-.29-.84l-10.07-10.3c-.32-.32-.81-.4-1.21-.2c-.55.28-13.55 7.02-22.22 22.24c-4.39 7.67-9.81 19.77-7.44 36.87zm30.03-13.88c6.86 0 11.85 4.71 11.85 11.2c0 6.49-4.99 11.2-11.85 11.2c-6.87 0-11.85-4.71-11.85-11.2c0-6.49 4.98-11.2 11.85-11.2z"></path>
+			</symbol>
+			<symbol id="digit-7"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-seven -->
+				<path fill="currentColor" d="M92.9 27.87H33.54c-.57 0-1.04.46-1.04 1.04v12.94c0 .57.47 1.04 1.04 1.04h34.07l-22.84 59.94c-.12.32-.08.68.11.96c.19.28.51.45.86.45H64.6c.43 0 .82-.26.98-.67l28.3-74.3c.12-.32.08-.68-.11-.96c-.21-.27-.53-.44-.87-.44z"></path>
+			</symbol>
+			<symbol id="digit-8"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-height -->
+				<path fill="currentColor" d="M81.67 61.25c4.09-3.93 6.51-9.25 6.51-15.38c0-12.98-10.75-22.41-25.57-22.41c-14.81 0-25.56 9.43-25.56 22.41c0 6.13 2.42 11.45 6.51 15.38c-5.8 4.45-9.32 11.08-9.32 18.88c0 14.41 11.93 24.87 28.38 24.87S91 94.54 91 80.13c0-7.81-3.52-14.43-9.33-18.88zm-19.06-6c-.26 0-.51.02-.76.03c-5.4-.34-9.27-4.17-9.27-9.41c0-5.49 4.22-9.48 10.03-9.48c5.82 0 10.04 3.98 10.04 9.48c0 5.24-3.86 9.07-9.27 9.41c-.26-.01-.5-.03-.77-.03zm0 14.35c6.47 0 11.15 4.43 11.15 10.53c0 6.09-4.68 10.52-11.15 10.52c-6.45 0-11.13-4.42-11.13-10.52S56.16 69.6 62.61 69.6z"></path>
+			</symbol>
+			<symbol id="digit-9"  viewBox="0 0 128 128">
+				<!-- from: noto-v1:digit-nine -->
+				<path fill="currentColor" d="M63.87 74.79C81.45 74.79 93 63.43 93 49.4C93 35.37 81.45 24 63.87 24c-17.56 0-29.12 11.37-29.12 25.4s11.56 25.39 29.12 25.39zm0-37.63c7.77 0 12.89 5.48 12.89 12.23c0 6.76-5.12 12.23-12.89 12.23c-7.77 0-12.89-5.48-12.89-12.23s5.12-12.23 12.89-12.23z"></path><path d="M83.3 41.75L66.87 24.61s25.07 5.09 26.04 24.14c.91 17.68-5.68 29.24-11.48 37.1c-10.35 14-24.21 19.1-24.21 19.1l-8.78-11.42s11.92-5.73 20.28-17.55c4.51-6.38 7.44-14.09 8.13-24.61l6.45-9.62z"></path>
+			</symbol>
+		</defs>
+	</svg>
+	<div>
+		<div class="toolbar">
+			<button onclick="reset_properties_values()">reset selection</button>
+			<button onclick="copy_selected_values()">copy css</button>
+		</div>
+		<div class="properties" id="all-flexbox-properties">
+			<div class="property">
+				<h2 class="property-name">flex-direction</h2>
+				<div class="values">
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="flex-direction_row">row</h4>
+						<div class="picto" style="flex-direction:row;" onpointerup="update('flex-direction', 'row')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="flex-direction_column">column</h4>
+						<div class="picto" style="flex-direction:column;" onpointerup="update('flex-direction', 'column')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="flex-direction_row-reverse">row-reverse</h4>
+						<div class="picto" style="flex-direction:row-reverse;" onpointerup="update('flex-direction', 'row-reverse')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="flex-direction_column-reverse">column-reverse</h4>
+						<div class="picto" style="flex-direction:column-reverse;" onpointerup="update('flex-direction', 'column-reverse')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<div class="property">
+				<h2 class="property-name">flex-wrap</h2>
+				<div class="values">
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="flex-wrap_nowrap">nowrap</h4>
+						<div class="picto" style="flex-wrap:nowrap;" onpointerup="update('flex-wrap', 'nowrap')">
+							<div class="bloc digit-1">1</div><div class="bloc digit-2">2</div>
+							<div class="bloc digit-3">3</div><div class="bloc digit-4">4</div>
+							<div class="bloc digit-5">5</div><div class="bloc digit-6">6</div>
+							<div class="bloc digit-7">7</div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="flex-wrap_wrap">wrap</h4>
+						<div class="picto" style="flex-wrap:wrap;" onpointerup="update('flex-wrap', 'wrap')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="flex-wrap_wrap-reverse">wrap-reverse</h4>
+						<div class="picto" style="flex-wrap:wrap-reverse;" onpointerup="update('flex-wrap', 'wrap-reverse')">
+							<div class="bloc digit-1">1</div><div class="bloc digit-2">2</div>
+							<div class="bloc digit-3">3</div><div class="bloc digit-4">4</div>
+							<div class="bloc digit-5">5</div><div class="bloc digit-6">6</div>
+							<div class="bloc digit-7">7</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="property">
+				<h2 class="property-name">align-items</h2>
+				<div class="values">
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-items_stretch">stretch</h4>
+						<div class="picto" style="align-items:stretch;" onpointerup="update('align-items', 'stretch')">
+							<div class="bloc digit-1" style="line-height: 8px;padding: 0 10px;"></div>
+							<div class="bloc digit-2" style="line-height: 8px;padding-bottom: 0;padding: 10px 0;"></div>
+							<div class="bloc digit-3" style="line-height: 8px;"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-items_flex-start">flex-start</h4>
+						<div class="picto" style="align-items:flex-start;" onpointerup="update('align-items', 'flex-start')">
+							<div class="bloc digit-1" style="line-height: 8px;padding: 0 10px;"></div>
+							<div class="bloc digit-2" style="line-height: 8px;padding-bottom: 0;padding: 10px 0;"></div>
+							<div class="bloc digit-3" style="line-height: 8px;"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-items_center">center</h4>
+						<div class="picto" style="align-items:center;" onpointerup="update('align-items', 'center')">
+							<div class="bloc digit-1" style="line-height: 8px;padding: 0 10px;"></div>
+							<div class="bloc digit-2" style="line-height: 8px;padding-bottom: 0;padding: 10px 0;"></div>
+							<div class="bloc digit-3" style="line-height: 8px;"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-items_flex-end">flex-end</h4>
+						<div class="picto" style="align-items:flex-end;" onpointerup="update('align-items', 'flex-end')">
+							<div class="bloc digit-1" style="line-height: 8px;padding: 0 10px;"></div>
+							<div class="bloc digit-2" style="line-height: 8px;padding-bottom: 0;padding: 10px 0;"></div>
+							<div class="bloc digit-3" style="line-height: 8px;"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-items_baseline">baseline</h4>
+						<div class="picto" style="align-items:baseline;" onpointerup="update('align-items', 'baseline')">
+							<div class="bloc digit-1" style="line-height: 8px;padding: 0 10px;"></div>
+							<div class="bloc digit-2" style="line-height: 8px;padding-bottom: 0;padding: 10px 0;"></div>
+							<div class="bloc digit-3" style="line-height: 8px;"></div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="property">
+				<h2 class="property-name">justify-content</h2>
+				<div class="values">
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="justify-content_flex-start">flex-start</h4>
+						<div class="picto" style="justify-content:flex-start;" onpointerup="update('justify-content', 'flex-start')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="justify-content_center">center</h4>
+						<div class="picto" style="justify-content:center;" onpointerup="update('justify-content', 'center')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="justify-content_flex-end">flex-end</h4>
+						<div class="picto" style="justify-content:flex-end;" onpointerup="update('justify-content', 'flex-end')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="justify-content_space-between">space-between</h4>
+						<div class="picto" style="justify-content:space-between;" onpointerup="update('justify-content', 'space-between')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="justify-content_space-around">space-around</h4>
+						<div class="picto" style="justify-content:space-around;" onpointerup="update('justify-content', 'space-around')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="justify-content_space-evenly">space-evenly</h4>
+						<div class="picto" style="justify-content:space-evenly;" onpointerup="update('justify-content', 'space-evenly')">
+							<div class="bloc digit-1"></div>
+							<div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="property" data-css-property="align-content">
+				<h2 class="property-name">align-content</h2>
+				<div class="values">
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-content_flex-start">flex-start</h4>
+						<div class="picto" style="align-content:flex-start;" onpointerup="update('align-content', 'flex-start')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-content_center">center</h4>
+						<div class="picto" style="align-content:center;" onpointerup="update('align-content', 'center')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-content_flex-end">flex-end</h4>
+						<div class="picto" style="align-content:flex-end;" onpointerup="update('align-content', 'flex-end')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-content_stretch">stretch</h4>
+						<div class="picto" style="align-content:stretch;" onpointerup="update('align-content', 'stretch')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-content_space-between">space-between</h4>
+						<div class="picto" style="align-content:space-between;" onpointerup="update('align-content', 'space-between')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-content_space-around">space-around</h4>
+						<div class="picto" style="align-content:space-around;" onpointerup="update('align-content', 'space-around')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="align-content_space-evenly">space-evenly</h4>
+						<div class="picto" style="align-content:space-evenly;" onpointerup="update('align-content', 'space-evenly')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="property" data-css-property="row-gap">
+				<h2 class="property-name">row-gap</h2>
+				<div class="values">
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="row-gap_0">0</h4>
+						<div class="picto" style="row-gap:0;" onpointerup="update('row-gap', '0')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="row-gap_4px">4px</h4>
+						<div class="picto" style="row-gap:4px;" onpointerup="update('row-gap', '4px')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="row-gap_8px">8px</h4>
+						<div class="picto" style="row-gap:8px;" onpointerup="update('row-gap', '8px')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="property" data-css-property="column-gap">
+				<h2 class="property-name">column-gap</h2>
+				<div class="values">
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="column-gap_0">0</h4>
+						<div class="picto" style="column-gap:0;" onpointerup="update('column-gap', '0')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="column-gap_4px">4px</h4>
+						<div class="picto" style="column-gap:4px;" onpointerup="update('column-gap', '4px')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+					<div class="value-description">
+						<h4 class="property-value" data-css-property_value="column-gap_8px">8px</h4>
+						<div class="picto" style="column-gap:8px;" onpointerup="update('column-gap', '8px')">
+							<div class="bloc digit-1"></div><div class="bloc digit-2"></div>
+							<div class="bloc digit-3"></div><div class="bloc digit-4"></div>
+							<div class="bloc digit-5"></div><div class="bloc digit-6"></div>
+							<div class="bloc digit-7"></div><div class="bloc digit-8"></div>
+							<div class="bloc digit-9"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+<script>
+
+
+//add digit label to blocs
+for(const v of [1, 2, 3, 4, 5, 6, 7, 8, 9].map(v => `digit-${v}`)) {
+	for(const b of document.querySelectorAll(`.${v}`)) {
+		b.innerHTML = `<svg version="2.0" width="8" height="8" style="color: currentColor;fill: currentColor"><use href="#${v}" /></svg>`;
+	}
+}
+
+// update the flexbox property value in all examples
+const update = (property, new_value) => {
+	// update examples using the new value for the selected property
+	const root = document.getElementById('all-flexbox-properties');
+	root.style.setProperty(`--${property}`, new_value);
+	//highlight the selected value for the propertie
+	for(let n of document.querySelectorAll(`[data-css-property_value^="${property}_"]`)) {
+		// remove previous highlight (if any)
+		n.setAttribute('data-selected', '0');
+	}
+	// highlight current value
+	document.querySelector(`[data-css-property_value="${property}_${new_value}"]`).setAttribute('data-selected', '1');
+}
+
+const copy_selected_values = () => {
+	// copy to clipboard the selected values for the properties
+	const selection = Array.from(document.querySelectorAll('[data-selected="1"]')).map(v => v.getAttribute('data-css-property_value').split('_'));
+	const css = selection.map(v => `${v[0]}: ${v[1]};\n`) .join('');
+	navigator.clipboard.writeText(css);
+	alert(css);
+}
+
+const reset_properties_values = () => {
+	update('flex-direction', 'row');
+	update('flex-wrap', 'wrap');
+	update('align-items', 'flex-start');
+	update('justify-content', 'flex-start');
+	update('align-content', 'flex-start');
+	update('row-gap', '0');
+	update('column-gap', '0');
+}
+
+reset_properties_values();
+
+</script>
+</body>
+</html>
